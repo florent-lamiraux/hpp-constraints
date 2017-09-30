@@ -290,7 +290,7 @@ namespace hpp {
 
         f.value   (d.output, arg);
         if (ComputeJac) f.jacobian(d.jacobian, arg);
-        d.error = d.output - d.rightHandSide;
+        d.error = (d.output - d.rightHandSide).vector ();
         applyComparison<ComputeJac>(d.comparison, d.inequalityIndices, d.error, d.jacobian, inequalityThreshold_);
 
         // Copy columns that are not reduced

@@ -148,7 +148,7 @@ namespace hpp {
             op.template integrate<true >(x, h, j, x_pdx);
             f.value (f_x_pdx, x_pdx);
 
-            jacobian.col (j) = ((f_x_pdx - f_x_mdx) / h[j]) / 2;
+            jacobian.col (j) = ((f_x_pdx - f_x_mdx).vector () / h[j]) / 2;
 
             op.reset(x, j, x_mdx);
             op.reset(x, j, x_pdx);
@@ -176,7 +176,7 @@ namespace hpp {
             op.template integrate<true >(x, h, j, x_dx);
             f.value (f_x_pdx, x_dx);
 
-            jacobian.col (j) = (f_x_pdx - f_x) / h[j];
+            jacobian.col (j) = (f_x_pdx - f_x).vector () / h[j];
 
             op.reset(x, j, x_dx);
             h[j] = 0;

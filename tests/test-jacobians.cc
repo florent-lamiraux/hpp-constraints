@@ -377,14 +377,13 @@ BOOST_AUTO_TEST_CASE (jacobian) {
   std::vector<ConfigurationPtr_t> cfgs (NUMBER_JACOBIAN_CALCULUS);
   for (size_t i = 0; i < NUMBER_JACOBIAN_CALCULUS; i++) cfgs[i] = cs.shoot();
   Configuration_t q1(device->currentConfiguration());
-  vector_t value1, value2, dvalue, error;
   vector_t errorNorm (MAX_NB_ERROR);
   vector_t dq (device->numberDof ()); dq.setZero ();
   matrix_t jacobian, fdCentral, fdForward, errorJacobian;
   for (DFs::iterator fit = functions.begin(); fit != functions.end(); ++fit) {
     DF& f = *(fit->second);
-    value1 = vector_t (f.outputSize ());
-    value2 = vector_t (f.outputSize ());
+    LiegroupElement value1 (LiegroupElement (f.outputSpace ()));
+    LiegroupElement value2 (LiegroupElement (f.outputSpace ()));
     errorNorm.setZero ();
     jacobian.resize(f.outputDerivativeSize (), f.inputDerivativeSize ());
     fdForward.resize(f.outputDerivativeSize (), f.inputDerivativeSize ());
@@ -392,7 +391,7 @@ BOOST_AUTO_TEST_CASE (jacobian) {
 
     for (size_t i = 0; i < NUMBER_JACOBIAN_CALCULUS; i++) {
       q1 = *cfgs[i];
-      f (value1, q1);
+      f.value (value1, q1);
       jacobian.setZero ();
       f.jacobian (jacobian, q1);
 
@@ -407,6 +406,9 @@ BOOST_AUTO_TEST_CASE (jacobian) {
 
       // Central: check the error
       errorJacobian = jacobian - fdCentral;
+      hppDout (info, "Function " << f.name ());
+      hppDout (info, "jacobian = " << jacobian);
+      hppDout (info, "finite difference = " << fdCentral);
       checkJacobianDiffIsZero<false> (f.name(), errorJacobian, sqrt(eps));
 
       // We check the jacobian for each DOF.
@@ -454,7 +456,7 @@ BOOST_AUTO_TEST_CASE (SymbolicCalculus_position) {
   DFptr relpos = RelativePosition::create ("RelPos", device, ee1, ee2, MId, MId);
 
   ConfigurationPtr_t q1, q2 = cs.shoot ();
-  vector_t value = vector_t (pos->outputSize ());
+  LiegroupElement value (pos->outputSpace ());
   matrix_t jacobian = matrix_t (pos->outputSize (), device->numberDof ());
   for (int i = 0; i < 100; i++) {
       q1 = cs.shoot ();
@@ -465,17 +467,17 @@ BOOST_AUTO_TEST_CASE (SymbolicCalculus_position) {
       relpos_sb_ptr->invalidate ();
 
       /// Position
-      (*pos) (value, *q1);
+      pos->value (value, *q1);
       pij->computeValue ();
-      BOOST_CHECK (pij->value ().isApprox (value));
+      BOOST_CHECK (pij->value ().isApprox (value.vector ()));
       jacobian.setZero ();
       pos->jacobian (jacobian, *q1);
       pij->computeJacobian ();
       BOOST_CHECK (pij->jacobian ().isApprox (jacobian));
       // Relative position
-      (*relpos) (value, *q1);
+      relpos->value (value, *q1);
       relpos_sb_ptr->computeValue ();
-      BOOST_CHECK (relpos_sb_ptr->value ().isApprox (value));
+      BOOST_CHECK (relpos_sb_ptr->value ().isApprox (value.vector ()));
       jacobian.setZero ();
       relpos->jacobian (jacobian, *q1);
       relpos_sb_ptr->computeJacobian ();
@@ -497,8 +499,8 @@ BOOST_AUTO_TEST_CASE (SymbolicCalculus_jointframe) {
   DFptr sf = SymbolicFunction<JointFrame>::create ("SymbolicFunctionTest", device, jf);
 
   ConfigurationPtr_t q1, q2 = cs.shoot ();
-  vector_t value1 = vector_t (trans->outputSize ());
-  vector_t value2 = vector_t (trans->outputSize ());
+  LiegroupElement value1 (trans->outputSpace ());
+  LiegroupElement value2 (trans->outputSpace ());
   matrix_t jacobian1 = matrix_t (trans->outputSize (), device->numberDof ());
   matrix_t jacobian2 = matrix_t (trans->outputSize (), device->numberDof ());
   for (int i = 0; i < 100; i++) {
@@ -506,9 +508,9 @@ BOOST_AUTO_TEST_CASE (SymbolicCalculus_jointframe) {
       device->currentConfiguration (*q1);
       device->computeForwardKinematics ();
 
-      (*trans) (value1, *q1);
-      (*sf) (value2, *q1);
-      BOOST_CHECK (value1.isApprox ( value2));
+      trans->value (value1, *q1);
+      sf->value (value2, *q1);
+      BOOST_CHECK (value1.vector ().isApprox (value2.vector ()));
       jacobian1.setZero ();
       jacobian2.setZero ();
       trans->jacobian (jacobian1, *q1);
