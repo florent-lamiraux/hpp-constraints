@@ -385,8 +385,8 @@ namespace hpp {
         logRelativePoseRhs.segment<2>(1) = logRhs.segment<2>(1);
       }
       assert(!logRelativePoseRhs.hasNaN());
-      relativePoseRhs = LiegroupSpace::R3xSO3()->exp(logRelativePoseRhs);
-      assert(*(relativePoseRhs.space()) == *LiegroupSpace::R3xSO3());
+      relativePoseRhs.vector() = logRelativePoseRhs;
+      assert(*(relativePoseRhs.space()) == *LiegroupSpace::Rn(6));
     }
         
 

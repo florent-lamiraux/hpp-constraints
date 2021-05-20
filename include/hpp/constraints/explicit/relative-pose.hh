@@ -157,6 +157,7 @@ namespace hpp {
         // Create LiegroupSpace instances to avoid useless allocation.
         static LiegroupSpacePtr_t SE3;
         static LiegroupSpacePtr_t R3xSO3;
+        static LiegroupSpacePtr_t R6;
         JointConstPtr_t joint1_, joint2_;
         Transform3f frame1_;
         Transform3f frame2_;

@@ -819,7 +819,7 @@ BOOST_AUTO_TEST_CASE(hybrid_solver_rhs)
   Configuration_t q, qrand;
 
   JointPtr_t left = device->getJointByName ("LWristPitch");
-  TransformationR3xSO3::Ptr_t frame (TransformationR3xSO3::create
+  TransformationSE3::Ptr_t frame (TransformationSE3::create
       ("LWristPitch", device, left, Transform3f::Identity()));
   Transformation::Ptr_t logFrame (Transformation::create
       ("LWristPitch", device, left, Transform3f::Identity()));
@@ -940,99 +940,6 @@ BOOST_AUTO_TEST_CASE (rightHandSide)
     BOOST_CHECK_MESSAGE (error.norm () < test_precision,
         "Error threshold exceeded. Error is " << error.transpose() << ", norm "
         << error.norm() << ". Precision is " << test_precision);
-  }
-}
-
-BOOST_AUTO_TEST_CASE (rightHandSideFromConfig)
-{
-  // Create a kinematic chain
-  DevicePtr_t device = hpp::pinocchio::unittest::makeDevice(HumanoidSimple);
-  JointPtr_t root = device->rootJoint (),
-             ee1 = device->getJointByName ("lleg5_joint"),
-             ee2 = device->getJointByName ("rleg5_joint");
-  BOOST_REQUIRE (device);
-
-  ComparisonTypes_t comp1
-    (EqualToZero<<Equality<<EqualToZero<<Equality<<EqualToZero<<Equality);
-  assert(comp1 [0] ==  EqualToZero);
-  assert(comp1 [2] ==  EqualToZero);
-  assert(comp1 [4] == EqualToZero);
-  ComparisonTypes_t comp2(2*Equality<<2*EqualToZero<<2*Equality);
-  assert(comp2 [0] == Equality);
-  assert(comp2 [1] == Equality);
-  assert(comp2 [2] == EqualToZero);
-  assert(comp2 [3] == EqualToZero);
-  assert(comp2 [4] == Equality);
-  assert(comp2 [5] == Equality);
-  // Create two relative transformation constraints
-  Transform3f tf1 (Transform3f::Identity());
-  vector3_t u; u << 0, -.2, 0;
-  Transform3f tf2 (Transform3f::Identity()); tf2.translation (u);
-
-  DifferentiableFunctionPtr_t
-    h(RelativeTransformation::create("RelativeTransformation", device, ee1, ee2,
-                                     tf1, tf2, std::vector <bool> (6, true)));
-  ImplicitPtr_t c1 (Implicit::create(h, comp1));
-  u << 1.2, 0, -1;
-  tf2.translation (u);
-  ImplicitPtr_t c2 (hpp::constraints::explicit_::RelativePose::create
-                    ("Transformation", device, JointPtr_t (), root, tf2, tf1,
-                     comp2, std::vector<bool>(6, true)));
-
-  BySubstitution solver (device->configSpace ());
-  solver.maxIterations(20);
-  solver.errorThreshold(test_precision);
-  solver.add (c1);
-  solver.add (c2);
-  //           0
-  //           rhs [1]
-  // f1 (q) =  0
-  //           rhs [3]
-  //           0
-  //           rhs [5]
-  //
-  //           rhs [6]
-  //           0
-  // f2 (q) =  0
-  //           rhs [9]
-  //           rhs [10]
-  //           rhs [11]
-  //           rhs [12]
-  for (size_type i=0; i<1000; ++i) {
-    Configuration_t q (device->configSize ()); q.setRandom ();
-    bool success;
-    // Set right hand side for both constraints from random configuration
-    success = solver.rightHandSideFromConfig (c1, q);
-    BOOST_CHECK (success);
-    success = solver.rightHandSideFromConfig (c2, q);
-    BOOST_CHECK (success);
-    // Store right hand side for each constraint
-    vector_t rhs1 (6); rhs1.setZero ();
-    vector_t rhs1_ (6); rhs1_.setZero ();
-    vector_t rhs2 (7); rhs2.setZero ();
-    vector_t rhs2_ (7); rhs2_.setZero ();
-    success = solver.getRightHandSide (c1, rhs1);
-    BOOST_CHECK (success);
-    success = solver.getRightHandSide (c2, rhs2);
-    BOOST_CHECK (success);
-    // Set right hand side for both constraints from other random configuration
-    q.setRandom ();
-    success = solver.rightHandSideFromConfig (c1, q);
-    BOOST_CHECK (success);
-    success = solver.rightHandSideFromConfig (c2, q);
-    BOOST_CHECK (success);
-    // Set right hand side from stored values
-    success = solver.rightHandSide (c1, rhs1);
-    BOOST_CHECK (success);
-    success = solver.rightHandSide (c2, rhs2);
-    BOOST_CHECK (success);
-    // Get right hand side for each constraint and compare to stored values
-    success = solver.getRightHandSide (c1, rhs1_);
-    BOOST_CHECK (success);
-    success = solver.getRightHandSide (c2, rhs2_);
-    BOOST_CHECK (success);
-    BOOST_CHECK ((rhs1 - rhs1_).norm() < 1e-10);
-    BOOST_CHECK ((rhs2 - rhs2_).norm() < 1e-10);
   }
 }
 

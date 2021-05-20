@@ -84,7 +84,7 @@ namespace hpp {
         ConvexShapeContactHoldPtr_t f(HPP_STATIC_PTR_CAST
                                       (ConvexShapeContactHold, functionPtr()));
         std::size_t ifloor, iobject;
-        LiegroupElement relativePoseRhs(LiegroupSpace::R3xSO3());
+        LiegroupElement relativePoseRhs(LiegroupSpace::Rn(6));
         f->complement()->computeRelativePoseRightHandSide
           (rhs, ifloor, iobject, relativePoseRhs);
         // Extract input configuration of relative pose from qin
@@ -106,7 +106,7 @@ namespace hpp {
         ConvexShapeContactHoldPtr_t f(HPP_STATIC_PTR_CAST
                                       (ConvexShapeContactHold, functionPtr()));
         std::size_t ifloor, iobject;
-        LiegroupElement relativePoseRhs(LiegroupSpace::R3xSO3());
+        LiegroupElement relativePoseRhs(LiegroupSpace::Rn(6));
         f->complement()->computeRelativePoseRightHandSide
           (rhs, ifloor, iobject, relativePoseRhs);
         // Extract input configuration of relative pose from qin
@@ -117,7 +117,7 @@ namespace hpp {
         Eigen::RowBlockIndices relPosInputIndices(relativePose->inputConf());
         vector_t qinRelPose = relPosInputIndices.rview(q);
         assert(!qinRelPose.hasNaN());
-        LiegroupElement outputRelPose(LiegroupSpace::R3xSO3());
+        LiegroupElement outputRelPose(LiegroupSpace::Rn(6));
         relativePose->outputValue(outputRelPose, qinRelPose, relativePoseRhs);
         relativePose->jacobianOutputValue(qinRelPose, outputRelPose,
                                           relativePoseRhs, jacobian);

@@ -28,6 +28,7 @@ namespace hpp {
     namespace explicit_ {
       LiegroupSpacePtr_t RelativePose::SE3 (LiegroupSpace::SE3 ());
       LiegroupSpacePtr_t RelativePose::R3xSO3 (LiegroupSpace::R3xSO3 ());
+      LiegroupSpacePtr_t RelativePose::R6 (LiegroupSpace::Rn(6));
 
       RelativePosePtr_t RelativePose::create
         (const std::string& name, const DevicePtr_t& robot,
@@ -91,12 +92,13 @@ namespace hpp {
       void RelativePose::implicitToExplicitRhs
       (LiegroupElementConstRef implicitRhs, vectorOut_t explicitRhs) const
       {
-        assert (*(implicitRhs.space ()) == *R3xSO3 ||
-		*(implicitRhs.space ()) == *SE3);
+        assert (*(implicitRhs.space ()) == *R6);
         assert (explicitRhs.size() == 6);
-        // convert implicitRhs to Transform3f M1
-        Transform3f M1((Quaternion_t(implicitRhs.vector().tail <4>()))
-		       .toRotationMatrix(), implicitRhs.vector().head <3>());
+        // p1 = exp_{R^3xSO(3)} (implicitRhs)
+        LiegroupElement p1 (R3xSO3->exp (implicitRhs.vector()));
+        // convert p1 to Transform3f M1
+        Transform3f M1 ((Quaternion_t (p1.vector ().tail <4> ()))
+                        .toRotationMatrix (), p1.vector ().head <3> ());
         // M2 = F_{2/J_2} M1 F_{2/J_2}^{-1}
         Transform3f M2 (frame2_ * M1 * frame2_.inverse ());
         // convert M2 to LiegroupElement p2
@@ -110,8 +112,7 @@ namespace hpp {
       void RelativePose::explicitToImplicitRhs (vectorIn_t explicitRhs,
                                           LiegroupElementRef implicitRhs) const
       {
-        assert (*(implicitRhs.space()) == *(R3xSO3) ||
-		*(implicitRhs.space()) == *SE3);
+        assert (*(implicitRhs.space ()) == *R6);
         assert (explicitRhs.size () == 6);
         // p1 = exp_{SE(3)} (explicitRhs)
         LiegroupElement p1 (SE3->exp (explicitRhs));
@@ -122,8 +123,10 @@ namespace hpp {
         Transform3f M2 (frame2_.inverse () * M1 * frame2_);
         // convert M2 to LiegroupElement p2
         vector7_t v2;
-        implicitRhs.vector().head <3>() = M2.translation ();
-        implicitRhs.vector().tail <4>() = Quaternion_t(M2.rotation()).coeffs();
+        v2.head <3> () = M2.translation ();
+        v2.tail <4> () = Quaternion_t (M2.rotation ()).coeffs ();
+        LiegroupElement p2 (v2, R3xSO3);
+        implicitRhs.vector() = p2 - R3xSO3->neutral ();
       }
 
       RelativePose::RelativePose
@@ -131,7 +134,8 @@ namespace hpp {
        const JointConstPtr_t& joint1, const JointConstPtr_t& joint2,
        const Transform3f& frame1, const Transform3f& frame2,
        ComparisonTypes_t comp, std::vector<bool> mask) :
-        Explicit (RelativeTransformationSE3::create
+        Explicit (GenericTransformation
+                  <RelativeBit | PositionBit | OrientationBit>::create
                   (name, robot, joint1, joint2, frame1, frame2,
 		   std::vector<bool>(6,true)),
                   RelativeTransformation::create

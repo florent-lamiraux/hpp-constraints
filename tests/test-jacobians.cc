@@ -175,7 +175,7 @@ BOOST_AUTO_TEST_CASE (jacobian) {
   functions.push_back (
       Transformation::create ("Transformation", device, ee1, tf1));
   functions.push_back (
-      TransformationR3xSO3::create ("TransformationR3xSO3", device, ee1, tf1));
+      TransformationSE3::create ("TransformationSE3", device, ee1, tf1));
   functions.push_back (
       RelativeTransformation::create ("RelativeTransformation", device, ee1, ee2, tf1, tf2));
   functions.push_back (
