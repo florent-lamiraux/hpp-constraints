@@ -144,10 +144,11 @@ namespace hpp {
     typedef GenericTransformation< RelativeBit | PositionBit | OrientationBit > RelativeTransformation;
     typedef GenericTransformation< RelativeBit | PositionBit                  > RelativePosition;
     typedef GenericTransformation< RelativeBit |               OrientationBit > RelativeOrientation;
-    typedef GenericTransformation<               PositionBit | OrientationBit | OutputR3xSO3Bit > TransformationR3xSO3;
-    typedef GenericTransformation< RelativeBit | PositionBit | OrientationBit | OutputR3xSO3Bit > RelativeTransformationR3xSO3;
-    typedef GenericTransformation<                             OrientationBit | OutputR3xSO3Bit > OrientationSO3;
-    typedef GenericTransformation< RelativeBit |               OrientationBit | OutputR3xSO3Bit > RelativeOrientationSO3;
+
+    typedef GenericTransformation<               PositionBit | OrientationBit | OutputSE3Bit > TransformationSE3;
+    typedef GenericTransformation< RelativeBit | PositionBit | OrientationBit | OutputSE3Bit > RelativeTransformationSE3;
+    typedef GenericTransformation<                             OrientationBit | OutputSE3Bit > OrientationSO3;
+    typedef GenericTransformation< RelativeBit |               OrientationBit | OutputSE3Bit > RelativeOrientationSO3;
 
     typedef shared_ptr<Position> PositionPtr_t;
     typedef shared_ptr<Orientation> OrientationPtr_t;

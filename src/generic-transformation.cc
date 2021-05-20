@@ -279,8 +279,8 @@ namespace hpp {
     HPP_SERIALIZATION_IMPLEMENT(hpp::constraints::RelativePosition);
     HPP_SERIALIZATION_IMPLEMENT(hpp::constraints::RelativeOrientation);
     HPP_SERIALIZATION_IMPLEMENT(hpp::constraints::RelativeTransformation);
-    HPP_SERIALIZATION_IMPLEMENT(hpp::constraints::TransformationR3xSO3);
-    HPP_SERIALIZATION_IMPLEMENT(hpp::constraints::RelativeTransformationR3xSO3);
+    HPP_SERIALIZATION_IMPLEMENT(hpp::constraints::TransformationSE3);
+    HPP_SERIALIZATION_IMPLEMENT(hpp::constraints::RelativeTransformationSE3);
     HPP_SERIALIZATION_IMPLEMENT(hpp::constraints::OrientationSO3);
     HPP_SERIALIZATION_IMPLEMENT(hpp::constraints::RelativeOrientationSO3);
   } // namespace constraints
@@ -328,7 +328,7 @@ BOOST_CLASS_EXPORT(hpp::constraints::Transformation)
 BOOST_CLASS_EXPORT(hpp::constraints::RelativePosition)
 BOOST_CLASS_EXPORT(hpp::constraints::RelativeOrientation)
 BOOST_CLASS_EXPORT(hpp::constraints::RelativeTransformation)
-BOOST_CLASS_EXPORT(hpp::constraints::TransformationR3xSO3)
-BOOST_CLASS_EXPORT(hpp::constraints::RelativeTransformationR3xSO3)
+BOOST_CLASS_EXPORT(hpp::constraints::TransformationSE3)
+BOOST_CLASS_EXPORT(hpp::constraints::RelativeTransformationSE3)
 BOOST_CLASS_EXPORT(hpp::constraints::OrientationSO3)
 BOOST_CLASS_EXPORT(hpp::constraints::RelativeOrientationSO3)
