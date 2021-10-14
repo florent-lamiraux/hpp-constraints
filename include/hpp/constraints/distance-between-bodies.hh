@@ -42,7 +42,7 @@ namespace hpp {
     {
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-      
+
       /// Create instance and return shared pointer
       ///
       /// \param name name of the constraint,
@@ -53,7 +53,7 @@ namespace hpp {
 						const DevicePtr_t& robot,
 						const JointPtr_t& joint1,
 						const JointPtr_t& joint2);
-      
+
       /// Create instance and return shared pointer
       ///
       /// \param name name of the constraint,
@@ -92,6 +92,23 @@ namespace hpp {
 				 ConfigurationIn_t argument) const;
       virtual void impl_jacobian (matrixOut_t jacobian,
 				  ConfigurationIn_t arg) const;
+
+      bool isEqual(const DifferentiableFunction& other) const {
+        const DistanceBetweenBodies& castother = dynamic_cast<const DistanceBetweenBodies&>(other);
+        if (!DifferentiableFunction::isEqual(other))
+          return false;
+
+        if (robot_ != castother.robot_)
+          return false;
+        if (joint1_ != castother.joint1_)
+          return false;
+        if (joint2_ != castother.joint2_)
+          return false;
+        if (data_ != castother.data_)
+          return false;
+
+        return true;
+      }
     private:
       typedef ::pinocchio::GeometryData GeometryData;
 

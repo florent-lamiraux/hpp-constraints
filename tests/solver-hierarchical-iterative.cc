@@ -260,6 +260,14 @@ BOOST_AUTO_TEST_CASE(mask)
     {
       jacobian.setIdentity();
     }
+
+    bool isEqual(const DifferentiableFunction& other) const {
+      const Identity& castother = dynamic_cast<const Identity&>(other);
+      if (!DifferentiableFunction::isEqual(other))
+        return false;
+
+      return true;
+    }
   }; // class Identity
   solver::HierarchicalIterative solver(LiegroupSpace::R3xSO3());
   solver.maxIterations(20);

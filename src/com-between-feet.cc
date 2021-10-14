@@ -36,7 +36,7 @@ namespace hpp {
         }
         return res;
       }
-    } // namespace 
+    } // namespace
 
     ComBetweenFeetPtr_t ComBetweenFeet::create (
         const std::string& name, const DevicePtr_t& robot,

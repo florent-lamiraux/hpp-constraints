@@ -53,7 +53,7 @@ namespace hpp {
         Traits<PointInJoint>::Ptr_t OP2 =
           PointInJoint::create (contacts[i].joint2,contacts[i].point2,robot->numberDof());
         Traits<VectorInJoint>::Ptr_t n2 =
-          VectorInJoint::create (contacts[i].joint2,contacts[i].normal2,robot->numberDof()); 
+          VectorInJoint::create (contacts[i].joint2,contacts[i].normal2,robot->numberDof());
 
         phi_ (0,i) = n2;
         phi_ (1,i) = (OG - OP2) ^ n2;

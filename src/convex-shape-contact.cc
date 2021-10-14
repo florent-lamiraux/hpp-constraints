@@ -388,7 +388,7 @@ namespace hpp {
       relativePoseRhs = LiegroupSpace::R3xSO3()->exp(logRelativePoseRhs);
       assert(*(relativePoseRhs.space()) == *LiegroupSpace::R3xSO3());
     }
-        
+
 
     void ConvexShapeContactComplement::impl_compute
     (LiegroupElementRef result, ConfigurationIn_t argument) const
@@ -439,7 +439,7 @@ namespace hpp {
         o << "position in joint:" << iendl;
         o << incindent << o_it->positionInJoint();
         o << decindent << iendl;
-        
+
       }
       for (ConvexShapes_t::const_iterator fl_it = floorConvexShapes_.begin ();
           fl_it != floorConvexShapes_.end (); ++fl_it) {

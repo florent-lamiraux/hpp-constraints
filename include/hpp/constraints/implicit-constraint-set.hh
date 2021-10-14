@@ -121,7 +121,7 @@ namespace hpp {
                 constraint != constraints.end(); ++constraint)
               add (*constraint);
           }
-        
+
       private:
         Implicits_t constraints_;
 

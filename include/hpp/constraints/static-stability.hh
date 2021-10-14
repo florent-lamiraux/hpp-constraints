@@ -41,6 +41,15 @@ namespace hpp {
           JointPtr_t joint1, joint2;
           vector3_t point1, point2;
           vector3_t normal1, normal2;
+          bool operator==(Contact_t const& other) const {
+            if (joint1 != other.joint1) return false;
+            if (joint2 != other.joint2) return false;
+            if (point1 != other.point1) return false;
+            if (point2 != other.point2) return false;
+            if (normal1 != other.normal1) return false;
+            if (normal2 != other.normal2) return false;
+            return true;
+          }
         };
         typedef std::vector <Contact_t> Contacts_t;
 
@@ -66,13 +75,28 @@ namespace hpp {
           return phi_;
         }
 
+      protected:
+        bool isEqual(const DifferentiableFunction& other) const {
+          const StaticStability& castother = dynamic_cast<const StaticStability&>(other);
+          if (!DifferentiableFunction::isEqual(other))
+            return false;
+
+          if (robot_ != castother.robot_)
+            return false;
+          if (contacts_ != castother.contacts_)
+            return false;
+          if (com_ != castother.com_)
+            return false;
+
+          return true;
+        }
       private:
         void impl_compute (LiegroupElementRef result,
                            ConfigurationIn_t argument) const;
 
         void impl_jacobian (matrixOut_t jacobian, ConfigurationIn_t argument) const;
 
-        static void findBoundIndex (vectorIn_t u, vectorIn_t v, 
+        static void findBoundIndex (vectorIn_t u, vectorIn_t v,
             value_type& lambdaMin, size_type* iMin,
             value_type& lambdaMax, size_type* iMax);
 
@@ -95,7 +119,7 @@ namespace hpp {
         mutable MoE_t phi_;
         mutable vector_t u_, uMinus_, v_;
         mutable matrix_t uDot_, uMinusDot_, vDot_;
-        mutable vector_t lambdaDot_; 
+        mutable vector_t lambdaDot_;
     };
     /// \}
   } // namespace constraints
